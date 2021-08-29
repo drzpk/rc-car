@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">RC Car Controller</string>
+    <string name="activity_device_list_control_begin_text">Click the button to seart searching for devices</string>
+    <string name="activity_device_list_control_begin_button">Search</string>
+    <string name="activity_device_list_control_cancel_text">Searching for devices…</string>
+    <string name="activity_device_list_control_cancel_button">Stop</string>
+    <string name="activity_device_list_control_retry_text">Search complete</string>
+    <string name="activity_device_list_control_retry_button">Retry</string>
+</resources>
