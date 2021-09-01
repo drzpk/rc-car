@@ -9,11 +9,19 @@ import android.graphics.PointF
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import dev.drzepka.arduino.rc_car.controller.R
 import kotlin.math.*
 
 class Joystick(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 
     var positionListener: PositionListener? = null
+
+    private val horizontalLayout =
+        context!!.theme.obtainStyledAttributes(attrs!!, R.styleable.Joystick, 0, 0).let {
+            val value = it.getBoolean(R.styleable.Joystick_horizontalLayout, false)
+            it.recycle()
+            value
+        }
 
     private val backgroundPaint = Paint().apply {
         style = Paint.Style.FILL
@@ -34,7 +42,8 @@ class Joystick(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, widthMeasureSpec)
+        val dimensions = if (horizontalLayout) heightMeasureSpec else widthMeasureSpec
+        super.onMeasure(dimensions, dimensions)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -102,7 +111,7 @@ class Joystick(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
         val maxPossibleY = abs(backgroundRadius * sin(angle))
 
         val fractionX = min(1f, max(-1f, (knobPosition.x - width / 2f) / maxPossibleX))
-        val fractionY = min(1f, max( -1f, (knobPosition.y - width / 2f) / maxPossibleY))
+        val fractionY = min(1f, max(-1f, (knobPosition.y - width / 2f) / maxPossibleY))
 
         positionListener?.onPositionChanged(fractionX, fractionY)
     }
