@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import dev.drzepka.arduino.rc_car.controller.Utils
 import dev.drzepka.arduino.rc_car.controller.bluetooth.connection.MockConnectionManager
 import dev.drzepka.arduino.rc_car.controller.bluetooth.connection.RealConnectionManager
+import dev.drzepka.arduino.rc_car.controller.model.ControlMessage
 import kotlin.concurrent.thread
 
 class ControllerViewModel(application: Application) : AndroidViewModel(application) {
@@ -19,6 +20,7 @@ class ControllerViewModel(application: Application) : AndroidViewModel(applicati
 
     private val manager =
         if (!Utils.isEmulator()) RealConnectionManager(application) else MockConnectionManager()
+    private val sender = MessageSender(manager)
 
     fun connect(mac: String) {
         if (this.mac == mac || state.value != null)
@@ -36,11 +38,13 @@ class ControllerViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     override fun onCleared() {
+        sender.stop()
         manager.disconnect()
     }
 
     fun setJoystickPosition(speed: Int, direction: Int) {
-        // todo:
+        val message = ControlMessage(speed, direction, false)
+        sender.setMessage(message)
     }
 
     private fun doConnect() {
@@ -55,6 +59,7 @@ class ControllerViewModel(application: Application) : AndroidViewModel(applicati
         try {
             manager.connect(mac!!)
             state.postValue(State.CONNECTED)
+            sender.start()
         } catch (e: Exception) {
             e.printStackTrace()
             errorMessage = e.message
