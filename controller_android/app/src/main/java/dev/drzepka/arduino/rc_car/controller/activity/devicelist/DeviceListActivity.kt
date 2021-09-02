@@ -1,8 +1,8 @@
 package dev.drzepka.arduino.rc_car.controller.activity.devicelist
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dev.drzepka.arduino.rc_car.controller.R
+import dev.drzepka.arduino.rc_car.controller.activity.controller.ControllerActivity
 import dev.drzepka.arduino.rc_car.controller.model.BluetoothDeviceData
 
 class DeviceListActivity : AppCompatActivity() {
@@ -41,6 +42,8 @@ class DeviceListActivity : AppCompatActivity() {
             refreshControlBar()
         }
         refreshControlBar()
+
+        // todo: pause searching when activity is paused
     }
 
     override fun onStop() {
@@ -76,6 +79,14 @@ class DeviceListActivity : AppCompatActivity() {
         }
     }
 
+    private fun goToController(device: BluetoothDeviceData) {
+        viewModel.stopSearchingDevices()
+
+        val intent = Intent(this, ControllerActivity::class.java)
+        intent.putExtra(ControllerActivity.EXTRA_DEVICE_MAC, device.mac)
+        startActivity(intent)
+    }
+
     inner class BluetoothDeviceAdapter : RecyclerView.Adapter<BluetoothDeviceHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BluetoothDeviceHolder {
@@ -94,13 +105,17 @@ class DeviceListActivity : AppCompatActivity() {
         }
     }
 
-    class BluetoothDeviceHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class BluetoothDeviceHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val text1 = view.findViewById<TextView>(android.R.id.text1)
         private val text2 = view.findViewById<TextView>(android.R.id.text2)
 
         fun update(device: BluetoothDeviceData) {
             text1.text = device.name
             text2.text = device.mac
+
+            itemView.setOnClickListener {
+                goToController(device)
+            }
         }
     }
 }

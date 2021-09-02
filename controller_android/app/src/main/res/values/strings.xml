@@ -8,6 +8,13 @@
     <string name="activity_device_list_control_retry_text">Search complete</string>
     <string name="activity_device_list_control_retry_button">Retry</string>
 
+    <string name="activity_controller_loading_dialog_title">Connecting…</string>
+    <string name="activity_controller_loading_dialog_text">Connecting to device %s.</string>
+    <string name="activity_controller_error_dialog_title">Error</string>
+    <string name="activity_controller_error_dialog_text">An error occurred while connecting to device %s: %s</string>
+    <string name="activity_controller_error_dialog_button_retry">Retry</string>
+    <string name="activity_controller_error_dialog_button_close">Close</string>
+    <string name="activity_controller_connected_toast">Connection established.</string>
     <string name="activity_controller_value_speed">Speed:</string>
     <string name="activity_controller_value_direction">Direction:</string>
     <string name="activity_controller_brake">Brake</string>
