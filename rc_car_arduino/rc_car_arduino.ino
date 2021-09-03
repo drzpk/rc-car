@@ -2,7 +2,13 @@
 #include "control_message.h"
 #include "motor_driver.h"
 
-SoftwareSerial bluetoothSerial(9, 10); // RX, TX
+const int BLUETOOTH_SERIAL_RX_PIN = 9;
+const int BLUETOOTH_SERIAL_TX_PIN = 10;
+const int BUZZER_PIN = 11;
+
+const int BUZZER_FREQUENCY = 100;
+
+SoftwareSerial bluetoothSerial(BLUETOOTH_SERIAL_RX_PIN, BLUETOOTH_SERIAL_TX_PIN);
 
 size_t bufferSize = 10;
 size_t bufferPos = 0;
@@ -19,9 +25,11 @@ void loop() {
   if (read) {
     ControlMessage* msg = parseControlMessage(read);
     if (msg) {
-      processMessage(msg);
+      processMessage(msg); // todo: processing functions should be lifted out of the 'read' condition
       delete msg;
     }
+
+    processHorn(msg);
   }
 }
 
@@ -48,4 +56,13 @@ char* readRawMessage() {
   }
 
   return 0;
+}
+
+void processHorn(ControlMessage* msg) {
+  bool hornStatus = msg && msg->horn;
+  if (hornStatus) {
+    tone(BUZZER_PIN, BUZZER_FREQUENCY, 1500);
+  } else {
+    noTone(BUZZER_PIN);
+  }
 }

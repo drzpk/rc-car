@@ -3,7 +3,12 @@ package dev.drzepka.arduino.rc_car.controller.model
 import kotlin.experimental.or
 import kotlin.math.round
 
-data class ControlMessage(val speed: Int, val direction: Int, val brake: Boolean) {
+data class ControlMessage(
+    val speed: Int,
+    val direction: Int,
+    val brake: Boolean,
+    val horn: Boolean
+) {
 
     /**
      * Rounds speed and direction to given precision.
@@ -19,7 +24,7 @@ data class ControlMessage(val speed: Int, val direction: Int, val brake: Boolean
         val roundedSpeed = (precision * round(speed.toFloat() / precision + 0.5f)).toInt()
         val roundedDirection = (precision * round(direction.toFloat() / precision + 0.5f)).toInt()
 
-        return ControlMessage(roundedSpeed, roundedDirection, brake)
+        return ControlMessage(roundedSpeed, roundedDirection, brake, horn)
     }
 
     fun serialize(): ByteArray {
@@ -28,7 +33,9 @@ data class ControlMessage(val speed: Int, val direction: Int, val brake: Boolean
         array.add(speed.toByte())
         array.add(direction.toByte())
 
-        val flags = (0).toByte() or brake.compareTo(false).toByte()
+        val flags = (0).toByte() or
+                brake.compareTo(false).toByte() or
+                horn.compareTo(false).toByte()
         array.add(flags)
 
         return array.toByteArray()

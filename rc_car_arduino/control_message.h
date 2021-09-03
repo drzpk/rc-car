@@ -11,6 +11,7 @@ struct ControlMessage {
   float speed; // [-1, 1]
   float direction; // [-1, 1] - [left, right]
   bool brake;
+  bool horn;
 
   String getRepresentation() {
     return "ControlMessage(" + String(speed) + ", " + String(direction) + ")";
