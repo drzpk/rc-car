@@ -41,13 +41,12 @@ class DeviceListActivity : AppCompatActivity() {
         viewModel.state.observe(this) {
             refreshControlBar()
         }
-        refreshControlBar()
 
-        // todo: pause searching when activity is paused
+        refreshControlBar()
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun onPause() {
+        super.onPause()
         viewModel.stopSearchingDevices()
     }
 
