@@ -12,18 +12,8 @@ const int RIGHT_MOTOR_PWM_PIN = 6;
 
 // Minimum speed required to start the motor
 const float MINIMUM_SPEED = 0.6;
-// Maximum time wihtout signal after which motors are stopped;
-const int MAX_INACTIVE_TIME = 500;
-// Time to ignore control messages after max inactive time has been reached.
-// This is to prevent from stuttering when message frequency is just above the inactivity time.
-const int COOLDOWN_TIME = 2000;
 // Maximum fraction of motor power that can be taken away from it when turning.
 const float MAX_TURN_RATIO = 0.6;
-
-bool working = true;
-unsigned long lastTime = 0;
-unsigned long lastProcessTime = 0;
-unsigned long cooldownAt = 0;
 
 
 void doProcessMessage(ControlMessage& msg);
@@ -43,25 +33,13 @@ void initializeMotorDriver() {
   pinMode(RIGHT_MOTOR_PWM_PIN, OUTPUT);
 
   setPins(0, HIGH, LOW, 0, HIGH, LOW);
-
-  lastTime = millis();
 }
 
 void processMessage(ControlMessage* msg) {
-  unsigned long currentProcessTime = millis();
-  if (cooldownAt > currentProcessTime) {
-    Serial.println("Cooldown...");
-    return;
-  }
-  
   if (msg) {
-    working = true;
-    lastProcessTime = currentProcessTime;
     doProcessMessage(*msg);
-  } else if (working && (currentProcessTime - lastProcessTime) > MAX_INACTIVE_TIME) {
-    working = false;
+  } else {
     stopMotors();
-    cooldownAt = millis() + COOLDOWN_TIME;
   }
 }
 

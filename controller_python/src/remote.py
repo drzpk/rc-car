@@ -51,8 +51,14 @@ def create_message():
     elif keyboard.is_pressed("right arrow"):
         message.direction = DIRECTION_VALUE
 
+    if keyboard.is_pressed("b"):
+        message.brake = True
+
     if keyboard.is_pressed("h"):
         message.horn = True
+
+    if keyboard.is_pressed("x"):
+        raise RuntimeError("Connection lost - test")
 
     return message
 

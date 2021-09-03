@@ -16,9 +16,13 @@ ControlMessage* parseControlMessage(char* raw) {
     return 0;
   }
 
+  int flags = (int) raw[MESSAGE_INDICATOR_SIZE + 2];
+
   ControlMessage* message = new ControlMessage();
   message->speed = speed / 100.0;
   message->direction = direction / 100.0;
+  message->brake = flags & 0x1;
+  message->horn = flags & 0x2;
   
   return message;
 }
