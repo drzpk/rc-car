@@ -7,6 +7,9 @@
     <string name="activity_device_list_control_cancel_button">Stop</string>
     <string name="activity_device_list_control_retry_text">Search complete</string>
     <string name="activity_device_list_control_retry_button">Retry</string>
+    <string name="activity_device_list_control_error_text">Cannot start the search. Ensure that bluetooth and location are enabled.</string>
+    <string name="activity_device_list_control_no_permission_text">Cannot search for devices - permission is denied.</string>
+    <string name="activity_device_list_control_no_permission_button">Request permissions</string>
 
     <string name="activity_controller_loading_dialog_title">Connecting…</string>
     <string name="activity_controller_loading_dialog_text">Connecting to device %s.</string>

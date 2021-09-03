@@ -43,6 +43,7 @@ class DeviceListActivity : AppCompatActivity() {
         }
 
         refreshControlBar()
+        requestPermissions(true)
     }
 
     override fun onPause() {
@@ -50,22 +51,55 @@ class DeviceListActivity : AppCompatActivity() {
         viewModel.stopSearchingDevices()
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE_ON_DEMAND)
+            viewModel.startSearchingDevices()
+    }
+
     private fun refreshControlBar() {
         when (viewModel.state.value!!) {
             DeviceListViewModel.State.READY -> {
                 controlProgressBar.visibility = View.GONE
                 controlText.setText(R.string.activity_device_list_control_begin_text)
+                controlButton.visibility = View.VISIBLE
                 controlButton.setText(R.string.activity_device_list_control_begin_button)
             }
             DeviceListViewModel.State.SEARCHING -> {
                 controlProgressBar.visibility = View.VISIBLE
                 controlText.setText(R.string.activity_device_list_control_cancel_text)
+                controlButton.visibility = View.VISIBLE
                 controlButton.setText(R.string.activity_device_list_control_cancel_button)
             }
             DeviceListViewModel.State.DONE -> {
                 controlProgressBar.visibility = View.GONE
                 controlText.setText(R.string.activity_device_list_control_retry_text)
+                controlButton.visibility = View.VISIBLE
                 controlButton.setText(R.string.activity_device_list_control_retry_button)
+            }
+            DeviceListViewModel.State.ERROR -> {
+                controlProgressBar.visibility = View.GONE
+                controlText.setText(R.string.activity_device_list_control_error_text)
+                controlButton.visibility = View.VISIBLE
+                controlButton.setText(R.string.activity_device_list_control_retry_button)
+            }
+            DeviceListViewModel.State.NO_PERMISSION -> {
+                controlProgressBar.visibility = View.GONE
+                controlText.setText(R.string.activity_device_list_control_no_permission_text)
+
+                val shouldShowRationale = viewModel.getRequiredPermissions()
+                    .all { shouldShowRequestPermissionRationale(it) }
+
+                if (shouldShowRationale) {
+                    controlButton.visibility = View.VISIBLE
+                    controlButton.setText(R.string.activity_device_list_control_no_permission_button)
+                } else {
+                    controlButton.visibility = View.GONE
+                }
             }
         }
     }
@@ -75,7 +109,14 @@ class DeviceListActivity : AppCompatActivity() {
             DeviceListViewModel.State.READY -> viewModel.startSearchingDevices()
             DeviceListViewModel.State.SEARCHING -> viewModel.stopSearchingDevices()
             DeviceListViewModel.State.DONE -> viewModel.startSearchingDevices()
+            DeviceListViewModel.State.ERROR -> viewModel.startSearchingDevices()
+            DeviceListViewModel.State.NO_PERMISSION -> requestPermissions(false)
         }
+    }
+
+    private fun requestPermissions(onStart: Boolean) {
+        val code = if (onStart) REQUEST_CODE_ON_START else REQUEST_CODE_ON_DEMAND
+        requestPermissions(viewModel.getRequiredPermissions().toTypedArray(), code)
     }
 
     private fun goToController(device: BluetoothDeviceData) {
@@ -116,5 +157,10 @@ class DeviceListActivity : AppCompatActivity() {
                 goToController(device)
             }
         }
+    }
+
+    companion object {
+        private const val REQUEST_CODE_ON_START = 1
+        private const val REQUEST_CODE_ON_DEMAND = 2
     }
 }

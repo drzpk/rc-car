@@ -6,7 +6,7 @@ abstract class BluetoothDeviceFinder {
 
     var listener: BluetoothDeviceListener? = null
 
-    abstract fun start()
+    abstract fun start(): Boolean
     abstract fun stop()
 
     interface BluetoothDeviceListener {

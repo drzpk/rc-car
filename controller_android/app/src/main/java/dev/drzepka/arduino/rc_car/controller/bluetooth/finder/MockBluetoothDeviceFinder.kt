@@ -4,12 +4,22 @@ import android.os.Handler
 import android.os.Looper
 import dev.drzepka.arduino.rc_car.controller.model.BluetoothDeviceData
 import java.lang.Thread.sleep
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 import kotlin.random.Random
 
 class MockBluetoothDeviceFinder : BluetoothDeviceFinder() {
 
-    override fun start() {
+    private val working = AtomicBoolean(false)
+
+    override fun start(): Boolean {
+        if (!working.get())
+            return false
+
+        val willStart = Random.nextInt(4) == 0
+        if (!willStart)
+            return false
+
         val foundDevices = Random.nextInt(2, RANDOM_BLUETOOTH_DEVICES.size)
         val shuffled = RANDOM_BLUETOOTH_DEVICES.shuffled().subList(0, foundDevices)
 
@@ -19,6 +29,9 @@ class MockBluetoothDeviceFinder : BluetoothDeviceFinder() {
             var counter = 0
             while (counter < foundDevices) {
                 sleep(Random.nextLong(100, 3000))
+
+                if (!working.get())
+                    break
 
                 val finalCounter = counter
                 Handler(Looper.getMainLooper()).post {
@@ -32,10 +45,12 @@ class MockBluetoothDeviceFinder : BluetoothDeviceFinder() {
                 listener?.apply { this.onSearchCompleted() }
             }
         }
+
+        return true
     }
 
     override fun stop() {
-        // nothing
+        working.set(false)
     }
 
     companion object {
