@@ -74,6 +74,9 @@ class DeviceListViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private fun hasPermissions(): Boolean {
+        if (Utils.isEmulator())
+            return true
+
         val application = getApplication<Application>()
 
         val requiredPermissions = getRequiredPermissions()

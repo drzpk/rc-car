@@ -14,7 +14,7 @@ class RealConnectionManager(application: Application) : ConnectionManager {
 
     override fun connect(mac: String) {
         val device = manager.adapter.getRemoteDevice(mac)
-        val socket = device.createRfcommSocketToServiceRecord(UUID.randomUUID())
+        val socket = device.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"))
         socket.connect()
     }
 

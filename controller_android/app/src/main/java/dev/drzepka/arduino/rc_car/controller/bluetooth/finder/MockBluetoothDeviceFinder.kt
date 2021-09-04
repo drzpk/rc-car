@@ -13,16 +13,17 @@ class MockBluetoothDeviceFinder : BluetoothDeviceFinder() {
     private val working = AtomicBoolean(false)
 
     override fun start(): Boolean {
-        if (!working.get())
+        if (working.get())
             return false
 
-        val willStart = Random.nextInt(4) == 0
+        val willStart = Random.nextInt(4) > 0
         if (!willStart)
             return false
 
         val foundDevices = Random.nextInt(2, RANDOM_BLUETOOTH_DEVICES.size)
         val shuffled = RANDOM_BLUETOOTH_DEVICES.shuffled().subList(0, foundDevices)
 
+        working.set(true)
         listener?.apply { this.onSearchStarted() }
 
         thread {

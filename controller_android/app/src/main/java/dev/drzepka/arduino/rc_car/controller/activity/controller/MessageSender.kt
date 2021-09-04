@@ -13,7 +13,7 @@ class MessageSender(private val connectionManager: ConnectionManager) {
     private val working = AtomicBoolean(false)
 
     init {
-        message.set(ControlMessage(0, 0, false))
+        message.set(ControlMessage(0, 0, brake = false, horn = false))
     }
 
     fun setMessage(message: ControlMessage) {

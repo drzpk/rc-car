@@ -22,4 +22,6 @@
     <string name="activity_controller_value_direction">Direction:</string>
     <string name="activity_controller_brake">Brake</string>
     <string name="activity_controller_horn">Horn</string>
+
+    <string name="menu_settings_title">Settings</string>
 </resources>

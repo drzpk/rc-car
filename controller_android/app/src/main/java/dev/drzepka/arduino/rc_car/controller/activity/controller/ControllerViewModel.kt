@@ -43,7 +43,7 @@ class ControllerViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun setJoystickPosition(speed: Int, direction: Int) {
-        val message = ControlMessage(speed, direction, false)
+        val message = ControlMessage(speed, direction, brake = false, horn = false)
         sender.setMessage(message)
     }
 

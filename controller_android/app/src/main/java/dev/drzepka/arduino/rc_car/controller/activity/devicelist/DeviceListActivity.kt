@@ -46,8 +46,8 @@ class DeviceListActivity : AppCompatActivity() {
         requestPermissions(true)
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onStop() {
+        super.onStop()
         viewModel.stopSearchingDevices()
     }
 
