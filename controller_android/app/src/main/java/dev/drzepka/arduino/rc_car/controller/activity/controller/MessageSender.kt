@@ -64,6 +64,6 @@ class MessageSender(private val connectionManager: ConnectionManager) {
     companion object {
         private const val TAG = "MessageSender"
         private const val SLEEP_TIME = 200L
-        private const val PING_INTERVAL = 5
+        private const val PING_INTERVAL = 4
     }
 }
