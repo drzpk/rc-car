@@ -90,30 +90,27 @@ class Joystick(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
                 knobPosition.y = radius * sin(angle) + width / 2f
 
                 invalidate()
-                notifyListener(angle)
+                notifyListener()
             }
 
             MotionEvent.ACTION_UP -> {
                 resetKnobPosition()
                 invalidate()
-                notifyListener(0f)
+                notifyListener()
             }
         }
 
         return true
     }
 
-    private fun notifyListener(angle: Float) {
+    private fun notifyListener() {
         if (positionListener == null)
             return
 
-        val maxPossibleX = abs(backgroundRadius * cos(angle))
-        val maxPossibleY = abs(backgroundRadius * sin(angle))
+        val fractionX = min(1f, max(-1f, (knobPosition.x - width / 2f) / backgroundRadius))
+        val fractionY = min(1f, max(-1f, (knobPosition.y - width / 2f) / backgroundRadius))
 
-        val fractionX = min(1f, max(-1f, (knobPosition.x - width / 2f) / maxPossibleX))
-        val fractionY = min(1f, max(-1f, (knobPosition.y - width / 2f) / maxPossibleY))
-
-        positionListener?.onPositionChanged(fractionX, fractionY)
+        positionListener?.onPositionChanged(fractionX, -fractionY)
     }
 
     private fun resetKnobPosition() {

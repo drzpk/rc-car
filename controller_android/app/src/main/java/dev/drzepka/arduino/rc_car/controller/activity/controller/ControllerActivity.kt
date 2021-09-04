@@ -47,9 +47,11 @@ class ControllerActivity : AppCompatActivity(), Joystick.PositionListener {
         val mac = intent.getStringExtra(EXTRA_DEVICE_MAC)!!
         viewModel.connect(mac)
 
-        startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            viewModel.notifySettingsChanged()
-        }
+        startForResult =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                viewModel.notifySettingsChanged()
+            }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -69,8 +71,8 @@ class ControllerActivity : AppCompatActivity(), Joystick.PositionListener {
     }
 
     override fun onPositionChanged(x: Float, y: Float) {
-        val speed = floor(x * 100).toInt()
-        val direction = floor(y * 100).toInt()
+        val speed = floor(y * 100).toInt()
+        val direction = floor(x * 100).toInt()
         viewModel.setJoystickPosition(speed, direction)
 
         speedValue.text = speed.toString()
