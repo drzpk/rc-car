@@ -1,5 +1,6 @@
 package dev.drzepka.arduino.rc_car.controller.activity.controller
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
 import android.app.ProgressDialog
@@ -8,6 +9,8 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import android.view.MotionEvent
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -52,6 +55,7 @@ class ControllerActivity : AppCompatActivity(), Joystick.PositionListener {
                 viewModel.notifySettingsChanged()
             }
 
+        initializeButtons()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -77,6 +81,27 @@ class ControllerActivity : AppCompatActivity(), Joystick.PositionListener {
 
         speedValue.text = speed.toString()
         directionValue.text = direction.toString()
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun initializeButtons() {
+        findViewById<Button>(R.id.activity_controller_button_brake).setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_DOWN)
+                viewModel.setBrake(true)
+            if (event.action == MotionEvent.ACTION_UP)
+                viewModel.setBrake(false)
+
+            true
+        }
+
+        findViewById<Button>(R.id.activity_controller_button_horn).setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_DOWN)
+                viewModel.setHorn(true)
+            if (event.action == MotionEvent.ACTION_UP)
+                viewModel.setHorn(false)
+
+            true
+        }
     }
 
     private fun onStateChanged(state: ControllerViewModel.State) {

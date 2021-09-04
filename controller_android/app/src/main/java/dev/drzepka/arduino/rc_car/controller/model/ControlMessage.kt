@@ -12,6 +12,26 @@ data class ControlMessage(
     val maximumTurnRatio: Int
 ) {
 
+    fun withSpeed(speed: Int): ControlMessage {
+        return ControlMessage(speed, direction, brake, horn, minimumSpeed, maximumTurnRatio)
+    }
+
+    fun withDirection(direction: Int): ControlMessage {
+        return ControlMessage(speed, direction, brake, horn, minimumSpeed, maximumTurnRatio)
+    }
+
+    fun withBrake(brake: Boolean): ControlMessage {
+        return ControlMessage(speed, direction, brake, horn, minimumSpeed, maximumTurnRatio)
+    }
+
+    fun withHorn(horn: Boolean): ControlMessage {
+        return ControlMessage(speed, direction, brake, horn, minimumSpeed, maximumTurnRatio)
+    }
+
+    fun withModifiers(minimumSpeed: Int, maximumTurnRatio: Int): ControlMessage {
+        return ControlMessage(speed, direction, brake, horn, minimumSpeed, maximumTurnRatio)
+    }
+
     /**
      * Rounds speed and direction to given precision.
      * An example for precision 5:
@@ -44,7 +64,7 @@ data class ControlMessage(
 
         val flags = (0).toByte() or
                 brake.compareTo(false).toByte() or
-                horn.compareTo(false).toByte()
+                (horn.compareTo(false).shl(1).toByte())
         array.add(flags)
 
         val modifiers = (minimumSpeed.shl(4) + maximumTurnRatio).toByte()

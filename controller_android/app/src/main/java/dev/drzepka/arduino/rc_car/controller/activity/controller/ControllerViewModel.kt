@@ -11,7 +11,8 @@ import dev.drzepka.arduino.rc_car.controller.bluetooth.connection.RealConnection
 import dev.drzepka.arduino.rc_car.controller.model.ControlMessage
 import kotlin.concurrent.thread
 
-class ControllerViewModel(application: Application) : AndroidViewModel(application), ConnectionManager.Listener {
+class ControllerViewModel(application: Application) : AndroidViewModel(application),
+    ConnectionManager.Listener {
 
     var mac: String? = null
         private set
@@ -25,7 +26,12 @@ class ControllerViewModel(application: Application) : AndroidViewModel(applicati
     private val sender = MessageSender(manager)
     private val settingsAccessor = SettingsAccessor(application)
 
-    private var settings = settingsAccessor.getSettings()
+    private var message = ControlMessage(0, 0,
+        brake = false,
+        horn = false,
+        minimumSpeed = settingsAccessor.getSettings().minimumSpeed,
+        maximumTurnRatio = settingsAccessor.getSettings().minimumSpeed
+    )
 
     init {
         manager.listener = this
@@ -47,7 +53,9 @@ class ControllerViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun notifySettingsChanged() {
-        settings = settingsAccessor.getSettings()
+        val settings = settingsAccessor.getSettings()
+        message = message.withModifiers(settings.minimumSpeed, settings.maximumTurnRatio)
+        sender.setMessage(message)
     }
 
     override fun onCleared() {
@@ -61,15 +69,17 @@ class ControllerViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     fun setJoystickPosition(speed: Int, direction: Int) {
-        val message = ControlMessage(
-            speed,
-            direction + settings.powerDecrease,
-            brake = false,
-            horn = false,
-            settings.minimumSpeed,
-            settings.maximumTurnRatio
-        )
+        message = message.withSpeed(speed).withDirection(direction).withPrecision(5)
+        sender.setMessage(message)
+    }
 
+    fun setBrake(value: Boolean) {
+        message = message.withBrake(value)
+        sender.setMessage(message)
+    }
+
+    fun setHorn(value: Boolean) {
+        message = message.withHorn(value)
         sender.setMessage(message)
     }
 
