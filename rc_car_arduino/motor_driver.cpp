@@ -10,21 +10,28 @@ const int RIGHT_MOTOR_FORWARD_PIN = 7;
 const int RIGHT_MOTOR_REVERSE_PIN = 5;
 const int RIGHT_MOTOR_PWM_PIN = 6;
 
-// Delay between changing direction (forward/reverse) 
-const int MOTOR_DIRECTION_CHANGE_DELAY = 500;
+const int MODE_STOP = 0;
+const int MODE_DRIVING_FORWARD = 1;
+const int MODE_DRIVING_REVERSE = 2;
+const int MODE_TURNING_LEFT = 3;
+const int MODE_TURNING_RIGHT = 4;
+
+// Delay between changing modes (direction forward/reverse, driving/turning in place) 
+// This should protect the motors between too much strain
+const int MODE_CHANGE_DELAY = 300;
 
 // Minimum speed required to start the motor
 float minimumSpeed = 0.6;
 // Maximum fraction of motor power that can be taken away from it when turning.
 float maximumTurnRatio = 0.6;
 
-int previousMotorDirection = 0;
-unsigned long previousMotorDirectionTime = 0;
+int previousMode = 0;
 
 void doProcessMessage(ControlMessage& msg);
 void stopMotors();
 void setSignalsWhenMoving(ControlMessage& msg);
 void setSignalsWhenOnlyTurning(ControlMessage& msg);
+void protectModeChange(int currentMode);
 void setPins(int leftPwm, int leftForward, int leftReverse,
              int rightPwm, int rightForward, int rightReverse);
 
@@ -49,18 +56,19 @@ void processMessage(ControlMessage* msg) {
 }
 
 void doProcessMessage(ControlMessage& msg) {
+  minimumSpeed = msg.minimumSpeed;
+  maximumTurnRatio = msg.maximumTurnRatio;
   if (msg.brake) {
     stopMotors();
+  } else if (!msg.speed && msg.direction) {
+    setSignalsWhenOnlyTurning(msg);
   } else {
-    minimumSpeed = msg.minimumSpeed;
-    maximumTurnRatio = msg.maximumTurnRatio;
     setSignalsWhenMoving(msg);
   }
 }
 
 void stopMotors() {
-  previousMotorDirection = 0;
-  previousMotorDirectionTime = 0;
+  protectModeChange(MODE_STOP);
   setPins(255, LOW, LOW, 255, LOW, LOW);
 }
 
@@ -88,26 +96,65 @@ void setSignalsWhenMoving(ControlMessage& msg) {
   rightPwm -= msg.direction > 0 ? pwmDelta : 0;
 
   int currentMotorDirection = msg.speed ? (abs(msg.speed) / msg.speed) : 0;
-  if (currentMotorDirection - previousMotorDirection != 0) {
-    // Motor direction was changed (excluding last direction = 0)
-    previousMotorDirection = currentMotorDirection;
-    previousMotorDirectionTime = millis();
+  int mode;
+  switch (currentMotorDirection) {
+    case 0:
+      mode = MODE_STOP;
+      break;
+    case 1:
+      mode = MODE_DRIVING_FORWARD;
+      break;
+    case -1:
+      mode = MODE_DRIVING_REVERSE;
+      break;
   }
 
-  bool motorDirectionChangeCooldown = millis() - previousMotorDirectionTime < MOTOR_DIRECTION_CHANGE_DELAY;
-  if (motorDirectionChangeCooldown || leftPwm < 255 * minimumSpeed) {
+  if (leftPwm < 255 * minimumSpeed) {
     leftPwm = 0;
   }
-  if (motorDirectionChangeCooldown || rightPwm < 255 * minimumSpeed) {
+  if (rightPwm < 255 * minimumSpeed) {
     rightPwm = 0;
   }
 
+  protectModeChange(mode);
   setPins(leftPwm, forward, reverse, rightPwm, forward, reverse);
 }
 
 // Turn motors in opposite directions
-void setSignalsWhenOnlyTurning(ControlMessage& message) {
-  // todo: ensure that this function can only be called when motors have stopped
+void setSignalsWhenOnlyTurning(ControlMessage& msg) {
+  int forward = HIGH;
+  int reverse = LOW;
+  int directionSign = abs(msg.direction) / msg.direction;
+
+  bool protectMotors;
+  if (directionSign == -1) {
+    forward = LOW;
+    reverse = HIGH;
+    protectModeChange(MODE_TURNING_LEFT);
+  } else {
+    protectModeChange(MODE_TURNING_RIGHT);
+  }
+
+  float power = minimumSpeed + (1.0 - minimumSpeed) * abs(msg.direction);
+  int pwm = floor(power * 255);
+  
+  setPins(pwm, forward, reverse, pwm, reverse, forward);
+}
+
+void protectModeChange(int currentMode) {
+  if (currentMode == MODE_STOP) {
+      previousMode = 0;
+      return;
+  }
+
+  if (currentMode != previousMode) {
+    if (previousMode != MODE_STOP) {
+      stopMotors();
+      delay(MODE_CHANGE_DELAY);  
+    }
+    
+    previousMode = currentMode;
+  }
 }
 
 void setPins(int leftPwm, int leftForward, int leftReverse,
