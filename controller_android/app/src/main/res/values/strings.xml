@@ -24,4 +24,10 @@
     <string name="activity_controller_horn">Horn</string>
 
     <string name="menu_settings_title">Settings</string>
+    <string name="settings_minimum_speed">Minimum speed</string>
+    <string name="settings_minimum_speed_description">Minimum PWM percentage to that will be sent to motors. Joystick values will be translated to PWM range above this point.</string>
+    <string name="settings_maximum_turn_ratio">Maximum turn ratio</string>
+    <string name="settings_maximum_turn_ratio_description">Maximum percentage of PWM speed that can be subtracted from given motor when turning. Affects turning speed.</string>
+    <string name="settings_power_decrease">Power decrease</string>
+    <string name="settings_power_decrease_description">Decreases power of a motor if it\'s running at a different speed.</string>
 </resources>

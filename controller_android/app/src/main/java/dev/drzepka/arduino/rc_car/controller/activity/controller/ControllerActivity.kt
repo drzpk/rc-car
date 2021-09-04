@@ -3,6 +3,7 @@ package dev.drzepka.arduino.rc_car.controller.activity.controller
 import android.app.AlertDialog
 import android.app.Dialog
 import android.app.ProgressDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -12,6 +13,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import dev.drzepka.arduino.rc_car.controller.R
+import dev.drzepka.arduino.rc_car.controller.activity.settings.SettingsActivity
 import dev.drzepka.arduino.rc_car.controller.widget.Joystick
 import kotlin.math.floor
 
@@ -51,6 +53,11 @@ class ControllerActivity : AppCompatActivity(), Joystick.PositionListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home)
             finish()
+
+        if (item.itemId == R.id.menu_action_settings) {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
 
         return true
     }

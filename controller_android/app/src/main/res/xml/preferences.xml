@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <SeekBarPreference
+        android:max="10"
+        app:defaultValue="6"
+        app:key="minimum_speed"
+        app:updatesContinuously="true"
+        app:min="0"
+        app:showSeekBarValue="true"
+        app:summary="@string/settings_minimum_speed_description"
+        app:title="@string/settings_minimum_speed" />
+
+    <SeekBarPreference
+        android:max="10"
+        app:updatesContinuously="true"
+        app:defaultValue="6"
+        app:key="maximum_turn_ratio"
+        app:min="0"
+        app:showSeekBarValue="true"
+        app:summary="@string/settings_maximum_turn_ratio_description"
+        app:title="@string/settings_maximum_turn_ratio" />
+
+    <SeekBarPreference
+        android:defaultValue="0"
+        android:max="10"
+        app:key="power_decrease"
+        app:min="-10"
+        app:showSeekBarValue="true"
+        app:summary="@string/settings_power_decrease_description"
+        app:title="@string/settings_power_decrease" />
+
+
+</PreferenceScreen>
