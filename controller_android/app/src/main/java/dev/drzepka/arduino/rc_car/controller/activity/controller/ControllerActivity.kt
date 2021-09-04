@@ -44,11 +44,9 @@ class ControllerActivity : AppCompatActivity(), Joystick.PositionListener {
         }
 
         viewModel.state.observe(this) {
-            onStateChanged(it!!)
+            if (it != null)
+                onStateChanged(it)
         }
-
-        val mac = intent.getStringExtra(EXTRA_DEVICE_MAC)!!
-        viewModel.connect(mac)
 
         startForResult =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -56,6 +54,17 @@ class ControllerActivity : AppCompatActivity(), Joystick.PositionListener {
             }
 
         initializeButtons()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val mac = intent.getStringExtra(EXTRA_DEVICE_MAC)!!
+        viewModel.connect(mac)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModel.disconnect()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

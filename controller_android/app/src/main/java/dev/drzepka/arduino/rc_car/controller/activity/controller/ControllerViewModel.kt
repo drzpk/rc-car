@@ -52,6 +52,12 @@ class ControllerViewModel(application: Application) : AndroidViewModel(applicati
         doConnect()
     }
 
+    fun disconnect() {
+        mac = null
+        state.value = null
+        manager.disconnect()
+    }
+
     fun notifySettingsChanged() {
         val settings = settingsAccessor.getSettings()
         message = message.withModifiers(settings.minimumSpeed, settings.maximumTurnRatio)
