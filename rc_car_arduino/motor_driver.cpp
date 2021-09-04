@@ -10,11 +10,16 @@ const int RIGHT_MOTOR_FORWARD_PIN = 7;
 const int RIGHT_MOTOR_REVERSE_PIN = 5;
 const int RIGHT_MOTOR_PWM_PIN = 6;
 
+// Delay between changing direction (forward/reverse) 
+const int MOTOR_DIRECTION_CHANGE_DELAY = 500;
+
 // Minimum speed required to start the motor
 float minimumSpeed = 0.6;
 // Maximum fraction of motor power that can be taken away from it when turning.
 float maximumTurnRatio = 0.6;
 
+int previousMotorDirection = 0;
+unsigned long previousMotorDirectionTime = 0;
 
 void doProcessMessage(ControlMessage& msg);
 void stopMotors();
@@ -54,6 +59,8 @@ void doProcessMessage(ControlMessage& msg) {
 }
 
 void stopMotors() {
+  previousMotorDirection = 0;
+  previousMotorDirectionTime = 0;
   setPins(255, LOW, LOW, 255, LOW, LOW);
 }
 
@@ -80,12 +87,18 @@ void setSignalsWhenMoving(ControlMessage& msg) {
   leftPwm -= msg.direction < 0 ? pwmDelta : 0;
   rightPwm -= msg.direction > 0 ? pwmDelta : 0;
 
-  Serial.println("left: " + String(leftPwm) + ", right: " + String(rightPwm));
+  int currentMotorDirection = msg.speed ? (abs(msg.speed) / msg.speed) : 0;
+  if (currentMotorDirection - previousMotorDirection != 0) {
+    // Motor direction was changed (excluding last direction = 0)
+    previousMotorDirection = currentMotorDirection;
+    previousMotorDirectionTime = millis();
+  }
 
-  if (leftPwm < 255 * minimumSpeed) {
+  bool motorDirectionChangeCooldown = millis() - previousMotorDirectionTime < MOTOR_DIRECTION_CHANGE_DELAY;
+  if (motorDirectionChangeCooldown || leftPwm < 255 * minimumSpeed) {
     leftPwm = 0;
   }
-  if (rightPwm < 255 * minimumSpeed) {
+  if (motorDirectionChangeCooldown || rightPwm < 255 * minimumSpeed) {
     rightPwm = 0;
   }
 
