@@ -5,6 +5,7 @@ import kotlin.random.Random
 
 class MockConnectionManager : ConnectionManager {
     override val isConnected = true
+    override var listener: ConnectionManager.Listener? = null
 
     override fun connect(mac: String) {
         Thread.sleep(Random.nextLong(400, 1500))

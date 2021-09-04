@@ -13,6 +13,9 @@ struct ControlMessage {
   bool brake;
   bool horn;
 
+  float minimumSpeed; // [0, 1]
+  float maximumTurnRatio; // [0, 1]
+
   String getRepresentation() {
     return "ControlMessage(" + String(speed) + ", " + String(direction) + ")";
   }

@@ -11,9 +11,9 @@ const int RIGHT_MOTOR_REVERSE_PIN = 5;
 const int RIGHT_MOTOR_PWM_PIN = 6;
 
 // Minimum speed required to start the motor
-const float MINIMUM_SPEED = 0.6;
+float minimumSpeed = 0.6;
 // Maximum fraction of motor power that can be taken away from it when turning.
-const float MAX_TURN_RATIO = 0.6;
+float maximumTurnRatio = 0.6;
 
 
 void doProcessMessage(ControlMessage& msg);
@@ -47,6 +47,8 @@ void doProcessMessage(ControlMessage& msg) {
   if (msg.brake) {
     stopMotors();
   } else {
+    minimumSpeed = msg.minimumSpeed;
+    maximumTurnRatio = msg.maximumTurnRatio;
     setSignalsWhenMoving(msg);
   }
 }
@@ -65,7 +67,7 @@ void setSignalsWhenMoving(ControlMessage& msg) {
 
   float power = 0;
   if (msg.speed != 0) {
-    power = MINIMUM_SPEED + (1.0 - MINIMUM_SPEED) * abs(msg.speed);
+    power = minimumSpeed + (1.0 - minimumSpeed) * abs(msg.speed);
   }
   
   leftPwm = rightPwm = floor(255 * power);
@@ -74,14 +76,16 @@ void setSignalsWhenMoving(ControlMessage& msg) {
     reverse = HIGH;
   }
 
-  float pwmDelta = floor(abs(msg.direction) * leftPwm * MAX_TURN_RATIO);
+  float pwmDelta = floor(abs(msg.direction) * leftPwm * maximumTurnRatio);
   leftPwm -= msg.direction < 0 ? pwmDelta : 0;
   rightPwm -= msg.direction > 0 ? pwmDelta : 0;
 
-  if (leftPwm < 255 * MINIMUM_SPEED) {
+  Serial.println("left: " + String(leftPwm) + ", right: " + String(rightPwm));
+
+  if (leftPwm < 255 * minimumSpeed) {
     leftPwm = 0;
   }
-  if (rightPwm < 255 * MINIMUM_SPEED) {
+  if (rightPwm < 255 * minimumSpeed) {
     rightPwm = 0;
   }
 

@@ -10,6 +10,8 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import dev.drzepka.arduino.rc_car.controller.R
@@ -25,6 +27,7 @@ class ControllerActivity : AppCompatActivity(), Joystick.PositionListener {
 
     private var loadingDialog: Dialog? = null
     private var errorDialog: Dialog? = null
+    private var startForResult: ActivityResultLauncher<Intent>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +46,10 @@ class ControllerActivity : AppCompatActivity(), Joystick.PositionListener {
 
         val mac = intent.getStringExtra(EXTRA_DEVICE_MAC)!!
         viewModel.connect(mac)
+
+        startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            viewModel.notifySettingsChanged()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -55,8 +62,7 @@ class ControllerActivity : AppCompatActivity(), Joystick.PositionListener {
             finish()
 
         if (item.itemId == R.id.menu_action_settings) {
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
+            startForResult?.launch(Intent(this, SettingsActivity::class.java))
         }
 
         return true

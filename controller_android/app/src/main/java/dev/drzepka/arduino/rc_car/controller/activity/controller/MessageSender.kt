@@ -2,6 +2,7 @@ package dev.drzepka.arduino.rc_car.controller.activity.controller
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import dev.drzepka.arduino.rc_car.controller.bluetooth.connection.ConnectionManager
 import dev.drzepka.arduino.rc_car.controller.model.ControlMessage
 import java.util.concurrent.atomic.AtomicBoolean
@@ -13,7 +14,7 @@ class MessageSender(private val connectionManager: ConnectionManager) {
     private val working = AtomicBoolean(false)
 
     init {
-        message.set(ControlMessage(0, 0, brake = false, horn = false))
+        message.set(ControlMessage(0, 0, brake = false, horn = false, 0, 0))
     }
 
     fun setMessage(message: ControlMessage) {
@@ -24,15 +25,18 @@ class MessageSender(private val connectionManager: ConnectionManager) {
         if (working.get())
             return
 
+        Log.i(TAG, "Starting sender")
         working.set(true)
         thread(block = this::worker)
     }
 
     fun stop() {
+        Log.i(TAG, "Stopping sender")
         working.set(false)
     }
 
     private fun worker() {
+        Log.i(TAG, "Starting worker")
         var previousMessage: ControlMessage? = null
         var currentPingStatus = 0
 
@@ -58,6 +62,7 @@ class MessageSender(private val connectionManager: ConnectionManager) {
     }
 
     companion object {
+        private const val TAG = "MessageSender"
         private const val SLEEP_TIME = 200L
         private const val PING_INTERVAL = 5
     }

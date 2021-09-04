@@ -7,16 +7,12 @@ class SettingsAccessor(context: Context) {
 
     private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-    fun getMinimumSpeed(): Int {
-        return preferences.getInt(MINIMUM_SPEED_PREFERENCE, 60)
-    }
-
-    fun getMaximumTurnRatio(): Int {
-        return preferences.getInt(MAXIMUM_TURN_RATIO_PREFERENCE, 60)
-    }
-
-    fun getPowerDecrease(): Int {
-        return preferences.getInt(POWER_DECREASE_PREFERENCE, 0)
+    fun getSettings(): SettingValues {
+        return SettingValues(
+            preferences.getInt(MINIMUM_SPEED_PREFERENCE, 60),
+            preferences.getInt(MAXIMUM_TURN_RATIO_PREFERENCE, 60),
+            preferences.getInt(POWER_DECREASE_PREFERENCE, 0)
+        )
     }
 
     companion object {
@@ -24,4 +20,6 @@ class SettingsAccessor(context: Context) {
         const val MAXIMUM_TURN_RATIO_PREFERENCE = "maximum_turn_ratio"
         const val POWER_DECREASE_PREFERENCE = "power_decrease"
     }
+
+    data class SettingValues(val minimumSpeed: Int, val maximumTurnRatio: Int, val powerDecrease: Int)
 }

@@ -12,20 +12,26 @@ class ControlMessage:
     direction: int
     brake: bool
     horn: bool
+    minimum_speed: int
+    maximum_turn_ratio: int
 
     def __init__(self):
         self.speed = 0
         self.direction = 0
         self.brake = False
         self.horn = False
+        self.minimum_speed = 6
+        self.maximum_turn_ratio = 6
 
     def encode(self) -> bytes:
         flags = int(self.brake) | (int(self.horn) << 1)
+        modifiers = (self.minimum_speed << 4) | self.maximum_turn_ratio
 
         return self._MESSAGE_INDICATOR \
                + self.speed.to_bytes(1, byteorder='big', signed=True) \
                + self.direction.to_bytes(1, byteorder='big', signed=True) \
-               + flags.to_bytes(1, byteorder='big', signed=True)
+               + flags.to_bytes(1, byteorder='big', signed=True) \
+               + modifiers.to_bytes(1, byteorder='big', signed=True)
 
     def __str__(self):
         return f"ControlMessage({self.speed}, {self.direction})"

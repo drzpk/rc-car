@@ -7,7 +7,9 @@ data class ControlMessage(
     val speed: Int,
     val direction: Int,
     val brake: Boolean,
-    val horn: Boolean
+    val horn: Boolean,
+    val minimumSpeed: Int,
+    val maximumTurnRatio: Int
 ) {
 
     /**
@@ -24,7 +26,14 @@ data class ControlMessage(
         val roundedSpeed = (precision * round(speed.toFloat() / precision + 0.5f)).toInt()
         val roundedDirection = (precision * round(direction.toFloat() / precision + 0.5f)).toInt()
 
-        return ControlMessage(roundedSpeed, roundedDirection, brake, horn)
+        return ControlMessage(
+            roundedSpeed,
+            roundedDirection,
+            brake,
+            horn,
+            minimumSpeed,
+            maximumTurnRatio
+        )
     }
 
     fun serialize(): ByteArray {
@@ -37,6 +46,9 @@ data class ControlMessage(
                 brake.compareTo(false).toByte() or
                 horn.compareTo(false).toByte()
         array.add(flags)
+
+        val modifiers = (minimumSpeed.shl(4) + maximumTurnRatio).toByte()
+        array.add(modifiers)
 
         return array.toByteArray()
     }
